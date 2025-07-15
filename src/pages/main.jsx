@@ -1,19 +1,12 @@
+
 import React, { useState, useRef } from "react";
 import { URL } from "../constants";
 
 function MainBody() {
   const [inputValue, setInputValue] = useState("");
-  const textareaRef = useRef(null);
   const [result, setResult] = useState("");
-
-
-  // const handleInputChange = (e) => {
-  //   setInputValue(e.target.value);
-
-  //   // Auto-resize
-  //   textareaRef.current.style.height = "auto";
-  //   textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-  // };
+  const textareaRef = useRef(null);
+  const [copied, setCopied] = useState(false);
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -22,28 +15,20 @@ function MainBody() {
     }
   };
 
-
   const handleSubmit = async () => {
     if (!inputValue.trim()) return;
 
     try {
       const response = await fetch(URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          "contents": [
+          contents: [
             {
-              "parts": [
-                {
-                  "text": inputValue
-                }
-              ]
+              parts: [{ text: inputValue }]
             }
           ]
-        }),
+        })
       });
 
       if (!response.ok) {
@@ -53,10 +38,9 @@ function MainBody() {
       }
 
       const data = await response.json();
-     const generatedText = data.candidates[0].content.parts[0].text;
-console.log("Generated Text:", generatedText);
-
-setResult(generatedText);
+      const generatedText = data.candidates[0].content.parts[0].text;
+      console.log("Generated Text:", generatedText);
+      setResult(generatedText);
 
       setInputValue("");
       textareaRef.current.style.height = "auto";
@@ -65,36 +49,57 @@ setResult(generatedText);
     }
   };
 
+   const handleCopy = async () => {
+    if (!result) return;
+    try {
+      await navigator.clipboard.writeText(result);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
 
   return (
-    <>
-      <div className="p-6 h-150 text-center">
-        <h1 className="text-3xl sm:text-4xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-600 bg-clip-text text-transparent font-bold mb-6">
-          Ask your questions here!
-        </h1>
-        <div className="p-4 mt-4 bg-zinc-800 border border-gray-600 rounded-xl  w-full mx-auto text-white shadow-md  overflow-y-scroll">
-          {result}
-        </div>
-      </div>
+    <div className="flex flex-col items-center justify-center h-screen bg-zinc-900 px-4">
+      <h1 className="text-3xl sm:text-4xl text-center bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent font-bold mb-6">
+        Ask your questions here!
+      </h1>
 
-      <div className="p-2 pr-4 bg-zinc-700 border border-gray-600 rounded-3xl max-w-lg w-full mx-auto flex items-end text-white shadow-md">
+      <div className="w-full max-w-6xl bg-zinc-800 border border-zinc-700 rounded-2xl p-4 shadow-lg overflow-y-auto max-h-96 text-white mb-4 whitespace-pre-wrap">
+        {result || "Your answer will appear here."}
+      </div>
+      {result && (
+        <button
+          onClick={handleCopy}
+          className="mb-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 transition-colors text-white rounded font-semibold"
+        >
+          {copied ? "Copied!" : "Copy"}
+        </button>
+      )}
+
+      <div className="flex w-full max-w-xl bg-zinc-800 border border-zinc-700 rounded-3xl shadow-md overflow-hidden">
         <textarea
           ref={textareaRef}
           placeholder="Ask me anything..."
           value={inputValue}
-          onChange={(event => setInputValue(event.target.value))}
+          onChange={(e) => {
+            setInputValue(e.target.value);
+            textareaRef.current.style.height = "auto";
+            textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+          }}
           onKeyDown={handleKeyDown}
           rows={1}
-          className="w-full max-h-40 overflow-y-auto p-3 text-white bg-transparent outline-none resize-none placeholder-gray-400"
+          className="flex-grow p-3 bg-transparent text-white resize-none focus:outline-none placeholder-gray-400 max-h-40 overflow-y-auto"
         />
         <button
           onClick={handleSubmit}
-          className="ml-2 px-4 py-2  font-semibold"
+          className="px-4 bg-indigo-600 hover:bg-indigo-700 transition-colors text-white font-semibold"
         >
           Ask
         </button>
       </div>
-    </>
+    </div>
   );
 }
 

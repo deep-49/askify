@@ -1,8 +1,8 @@
 function Sidebar() {
   return (
-    <div className=" text-white ">
+    <div className=" bg-zinc-800 text-white text-center h-screen">
       <h2 className="text-xl font-bold mb-4">Recent searches</h2>
-      <ul>
+      {/* <ul>
         <li className="mb-2">
           <a href="#" className="hover:underline">
             Link 1
@@ -18,7 +18,7 @@ function Sidebar() {
             Link 3
           </a>
         </li>
-      </ul>
+      </ul> */}
     </div>
   )
 }
