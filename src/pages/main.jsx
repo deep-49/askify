@@ -1,10 +1,11 @@
 
 import React, { useState, useRef } from "react";
 import { URL } from "../constants";
+import Answer from "../components/Answer";
 
 function MainBody() {
   const [inputValue, setInputValue] = useState("");
-  const [result, setResult] = useState("");
+  const [result, setResult] = useState([]);
   const textareaRef = useRef(null);
   const [copied, setCopied] = useState(false);
 
@@ -37,10 +38,11 @@ function MainBody() {
         throw new Error(`Error ${response.status}: ${response.statusText}`);
       }
 
-      const data = await response.json();
-      const generatedText = data.candidates[0].content.parts[0].text;
-      console.log("Generated Text:", generatedText);
-      setResult(generatedText);
+     const data = await response.json();
+let generatedText = data.candidates[0].content.parts[0].text;
+generatedText = generatedText.split("* ").map((item) => item.trim()).filter(item => item !== "");
+console.log("Generated Text Array:", generatedText);
+setResult(generatedText);
 
       setInputValue("");
       textareaRef.current.style.height = "auto";
@@ -67,7 +69,14 @@ function MainBody() {
       </h1>
 
       <div className="w-full max-w-6xl bg-zinc-800 border border-zinc-700 rounded-2xl p-4 shadow-lg overflow-y-auto max-h-96 text-white mb-4 whitespace-pre-wrap">
-        {result || "Your answer will appear here."}
+       {result.length > 0 ? (
+  result.map((item, index) => (
+    <Answer ans={item} key={index} />
+  ))
+) : (
+  <p>Your answer will appear here.</p>
+)}
+
       </div>
       {result && (
         <button
