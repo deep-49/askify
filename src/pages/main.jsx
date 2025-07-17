@@ -38,11 +38,13 @@ function MainBody() {
         throw new Error(`Error ${response.status}: ${response.statusText}`);
       }
 
-     const data = await response.json();
-let generatedText = data.candidates[0].content.parts[0].text;
-generatedText = generatedText.split("* ").map((item) => item.trim()).filter(item => item !== "");
-console.log("Generated Text Array:", generatedText);
-setResult(generatedText);
+      const data = await response.json();
+      let generatedText = data.candidates[0].content.parts[0].text;
+      generatedText = generatedText.split("* ").map((item) => item.trim()).filter(item => item !== "");
+      console.log("Generated Text Array:", generatedText);
+      // setResult( [inputValue ,generatedText]);
+      setResult([...result, { type: 'q', text: inputValue }, { type: 'a', text: generatedText }]);
+      console.log("Result State:", result);
 
       setInputValue("");
       textareaRef.current.style.height = "auto";
@@ -51,7 +53,7 @@ setResult(generatedText);
     }
   };
 
-   const handleCopy = async () => {
+  const handleCopy = async () => {
     if (!result) return;
     try {
       await navigator.clipboard.writeText(result);
@@ -63,19 +65,35 @@ setResult(generatedText);
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-zinc-900 px-4">
-      <h1 className="text-3xl sm:text-4xl text-center bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent font-bold mb-6">
-        Ask your questions here!
+    <div className="flex flex-col items-center justify-between h-screen bg-zinc-900 p-4">
+      <h1 className="text-3xl justify-start sm:text-4xl text-center bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent font-bold mb-6">
+        Ask your questions here! 
       </h1>
 
-      <div className="w-full max-w-6xl bg-zinc-800 border border-zinc-700 rounded-2xl p-4 shadow-lg overflow-y-auto max-h-96 text-white mb-4 whitespace-pre-wrap">
-       {result.length > 0 ? (
+      <div className="w-full max-w-7xl  max-h-8/12 p-4 shadow-lg overflow-y-auto font-base text-white mb-4 whitespace-pre-wrap">
+
+        <ul>
+          {result.map((item, index) => (
+           <div key={index + Math.random()} className={item.type ==="q"?"flex justify-end ":""}>
+            {
+               item.type=="q"? 
+            <li key={index + Math.random()} className="text-right border-8 border-zinc-800 bg-zinc-800 rounded-tl-3xl rounded-b-3xl w-fit  px-4" >   <Answer ans={item.text} totalResult={1} index={index}/> </li>
+             : item.text.map((ansItem, ansIndex)=>(
+             <li key={ansIndex + Math.random()} className="text-left p-1" >   <Answer ans={ansItem} totalResult={item.length} index={ansIndex}/> </li>))
+            }
+           </div>
+          ))}
+        </ul>
+        {/* <ul>
+        {result.length > 0 ? (
   result.map((item, index) => (
-    <Answer ans={item} key={index} />
+    <li key={index + Math.random()} className="text-left p-1" >   <Answer ans={item} key={index} /> </li>
+
   ))
 ) : (
   <p>Your answer will appear here.</p>
 )}
+       </ul> */}
 
       </div>
       {result && (
