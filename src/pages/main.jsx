@@ -44,7 +44,7 @@ function MainBody() {
       console.log("Generated Text Array:", generatedText);
       // setResult( [inputValue ,generatedText]);
       setResult([...result, { type: 'q', text: inputValue }, { type: 'a', text: generatedText }]);
-      console.log("Result State:", result);
+      // console.log("Result State:", result);
 
       setInputValue("");
       textareaRef.current.style.height = "auto";
@@ -53,57 +53,49 @@ function MainBody() {
     }
   };
 
-  const handleCopy = async () => {
-    if (!result) return;
-    try {
-      await navigator.clipboard.writeText(result);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch (err) {
-      console.error("Failed to copy:", err);
-    }
-  };
+  // const handleCopy = async () => {
+  //   if (!result) return;
+  //   try {
+  //     await navigator.clipboard.writeText(result);
+  //     setCopied(true);
+  //     setTimeout(() => setCopied(false), 1500);
+  //   } catch (err) {
+  //     console.error("Failed to copy:", err);
+  //   }
+  // };
 
   return (
-    <div className="flex flex-col items-center justify-between h-screen bg-zinc-900 p-4">
-      <h1 className="text-3xl justify-start sm:text-4xl text-center bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent font-bold mb-6">
+    <div className="flex flex-col items-center justify-around h-screen bg-zinc-900 p-1">
+      <h1 className="text-3xl  sm:text-4xl text-center bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent font-bold mb-6">
         Ask your questions here! 
       </h1>
 
-      <div className="w-full max-w-7xl  max-h-8/12 p-4 shadow-lg overflow-y-auto font-base text-white mb-4 whitespace-pre-wrap">
+      <div className="w-full max-w-7xl  max-h-96 p-4 shadow-lg overflow-y-auto font-base text-white mb-4 whitespace-pre-wrap">
 
         <ul>
           {result.map((item, index) => (
            <div key={index + Math.random()} className={item.type ==="q"?"flex justify-end ":""}>
             {
                item.type=="q"? 
-            <li key={index + Math.random()} className="text-right border-8 border-zinc-800 bg-zinc-800 rounded-tl-3xl rounded-b-3xl w-fit  px-4" >   <Answer ans={item.text} totalResult={1} index={index}/> </li>
+            <li key={index + Math.random()} className="text-right border-8 border-zinc-800 text-white text-lg bg-zinc-800 rounded-tl-3xl rounded-b-3xl w-fit  px-4" >   <Answer ans={item.text} totalResult={1} index={index}/> </li>
              : item.text.map((ansItem, ansIndex)=>(
-             <li key={ansIndex + Math.random()} className="text-left p-1" >   <Answer ans={ansItem} totalResult={item.length} index={ansIndex}/> </li>))
+             <li key={ansIndex + Math.random()} className="text-left p-1" >   <Answer ans={ansItem} totalResult={item.text.length} index={ansIndex}/> </li>))
             }
            </div>
           ))}
         </ul>
-        {/* <ul>
-        {result.length > 0 ? (
-  result.map((item, index) => (
-    <li key={index + Math.random()} className="text-left p-1" >   <Answer ans={item} key={index} /> </li>
-
-  ))
-) : (
-  <p>Your answer will appear here.</p>
-)}
-       </ul> */}
+      
+       
 
       </div>
-      {result && (
+      {/* {result && (
         <button
           onClick={handleCopy}
           className="mb-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 transition-colors text-white rounded font-semibold"
         >
           {copied ? "Copied!" : "Copy"}
         </button>
-      )}
+      )} */}
 
       <div className="flex w-full max-w-xl bg-zinc-800 border border-zinc-700 rounded-3xl shadow-md overflow-hidden">
         <textarea
